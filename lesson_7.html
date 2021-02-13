@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Урок 7. Оператор ветвления if</title>
+</head>
+<body>
+    <!--  Реализовать алгоритм игры в загадки.
+        Программа задает игроку 2 загадки и выводит количество верных ответов -->
+    <script>
+        var answer = 0;
+        var enigma_1 = prompt('Каких камней нет в море?'); // ответ - сухих
+            if ( enigma_1 == 'сухих' ){
+                ++answer;
+                alert ('Правильно! Верных решений: ' + answer);
+            } else {
+                alert ('Неправильно! Верных решений: ' + answer)
+            };
+        var enigma_2 = prompt('Кто маленький, серенький, на слона похож?'); // ответ - слоненок
+            if ( enigma_2 == 'слоненок' ){
+                ++answer;
+                alert ('Правильно! Верных решений: ' + answer);
+            } else {
+                alert ('Неправильно! Верных решений: ' + answer)
+            };
+    </script>
+</body>
+</html>
