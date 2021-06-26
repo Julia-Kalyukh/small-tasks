@@ -1,2 +1,6 @@
 # course_JS_and_React
-https://www.udemy.com/course/javascript_full/
+
+Полный курс по JavaScript + React от Ивана Петриченко
+
+
+https://www.udemy.com/course/javascript_full
