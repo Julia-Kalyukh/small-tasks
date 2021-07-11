@@ -1,7 +1,6 @@
 // Задачи:
-    // а) ф-ция, которая будет отвечать за открытие модального окна;
-    // б) ф-ция, которая будет за закрытие модального окна;
-    // в) подвязать на несколько тригеров обработчики событий.
+    // а) Вызов модального окна через определенное время;
+    // б) Если пользователь долистал до конца страницы - вывести модальное окно.
 
 
 window.addEventListener('DOMContentLoaded', function() {
@@ -101,47 +100,53 @@ window.addEventListener('DOMContentLoaded', function() {
 
 // Modal
 
-    // 1 - Определение переменных
-    const modalTrigger = document.querySelectorAll('[data-modal]'), // получение data-атрибута через квадратные скобки
+    const modalTrigger = document.querySelectorAll('[data-modal]'),
           modal = document.querySelector('.modal'),
           modalCloseBtn = document.querySelector('[data-close]');
 
-    // 2 - Привязка обработчика на несколько тригерров
+    // 2 - Создание ф-ции открытия модального окна
+    function openModal() {
+        modal.classList.toggle('show');
+        document.body.style.overflow = 'hidden';
+        // 3 - Если пользователь сам открыл окно, то не открывать по интервалу
+        clearInterval(modalTimeId);
+    }
+    
     modalTrigger.forEach(btn => {
-        // 3 - Открытие модального окна
-        btn.addEventListener('click', () => {
-            // Вариант №1
-                // Добавить класс 
-                // modal.classList.add('show');
-                // Удалить класс
-                // modal.classList.remove('hide');
-            // Вариант №2
-            modal.classList.toggle('show');
-
-            // 5 - Блокировка прокрутки страницы
-            document.body.style.overflow = 'hidden';
-        });
+        btn.addEventListener('click', openModal);
     });
 
-    // 4 - Закрытие модального окна
-    function closeModal(){
+    // Закрытие модального окна
+    function closeModal() {
         modal.classList.toggle('show');
-        // 6 - Разрешить прокрутку страницы
         document.body.style.overflow = '';
     }
     modalCloseBtn.addEventListener('click', closeModal);
 
-    // 7 - Закрыть после нажатия на кнопку 'Перезвонить мне'
+    // Закрыть после нажатия на кнопку
     modal.addEventListener('click', (e) => {
         if (e.target === modal) {
             closeModal();
         }
     });
 
-    // 8 - Закрыть после нажатия на кнопку 'escape'
     document.addEventListener('keydown', (e) => {
-        if (e.code === 'Escape' && modal.classList.contains('show')) { // ф-ция вызывается только при открытом окне
+        if (e.code === 'Escape' && modal.classList.contains('show')) {
             closeModal();
         }
     });
+
+    // 1 - Создание переменной интервала
+    const modalTimeId = setTimeout(openModal, 3000);
+
+    // 4 - Показывать модальное окно при скроле до конца страницы
+    function showModalByScroll() {
+        if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight - 1 ) { // -1 - для исключения бага
+            openModal();
+            window.removeEventListener('scroll', showModalByScroll);
+        }
+    }
+    // 5 - Обработчик события на окно
+    window.addEventListener('scroll', showModalByScroll);
+
 });
