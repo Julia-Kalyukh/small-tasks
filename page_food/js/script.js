@@ -1,11 +1,7 @@
 // Задачи:
-    // а) ф-ция, которая будет устанавливать таймер;
-    // б) ф-ционал, который будет определять разницу между временем;
-    // в) ф-ция, которая будет обновлять таймер
-
-    // Возможны 2 варианта:
-        // 1. Честный таймер, который отсчитываает реальное время
-        // 2. Маркетинговый таймер, который запоминает пользователя
+    // а) ф-ция, которая будет отвечать за открытие модального окна;
+    // б) ф-ция, которая будет за закрытие модального окна;
+    // в) подвязать на несколько тригеров обработчики событий.
 
 
 window.addEventListener('DOMContentLoaded', function() {
@@ -50,24 +46,17 @@ window.addEventListener('DOMContentLoaded', function() {
 
 //Timer
 
-    // 1 - Конечная дата
     const deadline = '2021-09-15';
-
-    // 2 - Определение разницы между дедлайном и текущим временем
+    
     function getTimeRemaining(endtime) {
-        const t = Date.parse(endtime) - Date.parse(new Date()), // переводим строку переменной 'deadline' в число и отнимаем текущее время
-              // Необходимо посчитать время, которое будет отражаться в таймере:
-              // * Кол-во оставшихся мс надо разделить на кол-во мс в 1 дне + округлить
+        const t = Date.parse(endtime) - Date.parse(new Date()), 
               days = Math.floor( t / (1000 * 60 * 60 * 24) ),
-              // * Для выведения часов надо узнать остаток, чтобы не выводить более 24ч
               hours = Math.floor( t / (1000 * 60 * 60)  % 24),
-              // * Узнаем остаток, чтобы не выводить более 60 мин и сек
               minutes = Math.floor( (t / 1000 / 60) % 60),
               seconds = Math.floor( (t / 1000) % 60);
-        
-        // 3 - Возврат объекта в глобальную видимость
+
         return {
-            'total': t, // общее кол-во мс
+            'total': t, 
             'days': days,
             'hours': hours,
             'minutes': minutes,
@@ -75,7 +64,6 @@ window.addEventListener('DOMContentLoaded', function() {
         };
     }
 
-    // 13 - Проверка числа и подрисовка нуля
     function getZero(num) {
         if (num >= 0 && num < 10) { 
             return `0${num}`;
@@ -84,42 +72,76 @@ window.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // 4 - ф-ция, устанавл. таймер на страницу
     function setClock(selector, endtime) {
-
-        // 5 - Переменные, в которые будут помещаться эл-ты со страницы:
-        const timer = document.querySelector(selector), // передаем класс
-              days = timer.querySelector('#days'), // поиск по id
+        const timer = document.querySelector(selector), 
+              days = timer.querySelector('#days'), 
               hours = timer.querySelector('#hours'),
               minutes = timer.querySelector('#minutes'),
               seconds = timer.querySelector('#seconds'),
-
-              // 9 - Запуск ф-ции каждую секунду
-              timeInterval = setInterval(updateClock, 1000); // запуск ф-ции через опр. промежуток времени
-
-        // 12 - Запуск ф-ции вручную, чтобы не было мигания верстки при обновлении страницы
-        updateClock(); // далее будет работать 'setInterval'
-
+              timeInterval = setInterval(updateClock, 1000); 
+              
+        updateClock(); 
         
-        // 6 - Ф-ция, обновл. таймер каждую секунду
         function updateClock() {
-
-            // 7 - Расчет времени, который остался в данную секунду
             const t = getTimeRemaining(endtime);
 
-            // 8 - Размещение данных на странице
             days.innerHTML = getZero(t.days);
             hours.innerHTML = getZero(t.hours);
             minutes.innerHTML = getZero(t.minutes);
             seconds.innerHTML = getZero(t.seconds);
 
-            // 10 - Остановка таймера
             if (t.total <= 0) {
                 clearInterval(timeInterval);
             }
         }
     }
 
-    // 11 - Запуск 
     setClock('.timer', deadline);
+
+
+// Modal
+
+    // 1 - Определение переменных
+    const modalTrigger = document.querySelectorAll('[data-modal]'), // получение data-атрибута через квадратные скобки
+          modal = document.querySelector('.modal'),
+          modalCloseBtn = document.querySelector('[data-close]');
+
+    // 2 - Привязка обработчика на несколько тригерров
+    modalTrigger.forEach(btn => {
+        // 3 - Открытие модального окна
+        btn.addEventListener('click', () => {
+            // Вариант №1
+                // Добавить класс 
+                // modal.classList.add('show');
+                // Удалить класс
+                // modal.classList.remove('hide');
+            // Вариант №2
+            modal.classList.toggle('show');
+
+            // 5 - Блокировка прокрутки страницы
+            document.body.style.overflow = 'hidden';
+        });
+    });
+
+    // 4 - Закрытие модального окна
+    function closeModal(){
+        modal.classList.toggle('show');
+        // 6 - Разрешить прокрутку страницы
+        document.body.style.overflow = '';
+    }
+    modalCloseBtn.addEventListener('click', closeModal);
+
+    // 7 - Закрыть после нажатия на кнопку 'Перезвонить мне'
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+
+    // 8 - Закрыть после нажатия на кнопку 'escape'
+    document.addEventListener('keydown', (e) => {
+        if (e.code === 'Escape' && modal.classList.contains('show')) { // ф-ция вызывается только при открытом окне
+            closeModal();
+        }
+    });
 });
