@@ -140,63 +140,56 @@ window.addEventListener('DOMContentLoaded', function() {
 
 
 // Использование классов для карточек
+// Использование rest-оператора и параметров по умолчанию
 
-    // 1 - Создание класса (создает только верстку)
     class MenuCard {
-        constructor(src, alt, title, descr, price, parentSelector) {
+        constructor(src, alt, title, descr, price, parentSelector, ...classes) { // 1 - rest-оператор
             this.src = src;
             this.alt = alt;
             this.title = title;
             this.descr = descr;
             this.price = price;
-            // 6 - Получение родителя (также можно вычислять в методе'render')
-            this.parent = document.querySelector(parentSelector); // DOM-элемент
-            this.transfer = 74; // курс доллара к рублю
+            this.classes = classes; // пустой массив - все равно массив
+            this.parent = document.querySelector(parentSelector);
+            this.transfer = 74; 
             this.changeToRUB();
             
         }
 
-        // 2 - Конвертация валют (цена в БД будет в долларах)
         changeToRUB() {
-            // Когда трансформируем число - в него же и записываем рез-т
             this.price *= this.transfer;
-            // Конвертацию возможно поместить или в метод 'render' или в конструктор
         }
 
-        // 3 - Формирование верстки
-            // Создать эл-т, в него поместить опред-ную верстку,
-            // верстку дополнить теми данными, которые приходят как аргументы и
-            // поместить э-т на страницу
         render(){
-            // 4 - Создание э-та
             const element = document.createElement('div');
-            // 5 - Динамическое формирование э-та
+            
+            // 4 - Проверка для назначения дефолтного значения
+            if (this.classes.length === 0) {
+                // 5 -  Перезапись пустого массива
+                this.element = 'menu__item';
+                // 6 - Добавление класса по умолчанию
+                element.classList.add(this.element);
+            } else {
+                // 2 - Перебор и обработка массива классов
+                // Каждый эл-т массива 'className'
+                // 'element' - новосозданный 'div', обращаемся к его classList и добавляем каждый эл-т из массива
+                this.classes.forEach(className => element.classList.add(className));
+            }
+            
             element.innerHTML = `
-                <div class="menu__item">
-                    <img src=${this.src} alt=${this.alt}>
-                    <h3 class="menu__item-subtitle">${this.title}</h3>
-                    <div class="menu__item-descr">${this.descr}</div>
-                    <div class="menu__item-divider"></div>
-                    <div class="menu__item-price">
-                        <div class="menu__item-cost">Цена:</div>
-                        <div class="menu__item-total"><span>${this.price}</span> руб/день</div>
-                    </div>
+                <img src=${this.src} alt=${this.alt}>
+                <h3 class="menu__item-subtitle">${this.title}</h3>
+                <div class="menu__item-descr">${this.descr}</div>
+                <div class="menu__item-divider"></div>
+                <div class="menu__item-price">
+                    <div class="menu__item-cost">Цена:</div>
+                    <div class="menu__item-total"><span>${this.price}</span> руб/день</div>
                 </div>
             `;
-            // 7 - Помещение э-та на страницу
             this.parent.append(element);
         }
     }
-
-    // 8 - Создание нового объекта
-        // Вариант 1:
-            // const div = new MenuCard(аргументы);
-            // div.render();
-    // Вариант 2 - сокращение записи:
-        // Объект может существовать без переменной
-        // Применяется только тогда, когда объект используется только на месте,
-        // без дальнейшего вызова, тк на него нет ссылок
-    
+    // 3 - Добавляем класс
     // 1
     new MenuCard(
         'img/tabs/vegy.jpg',
@@ -204,7 +197,8 @@ window.addEventListener('DOMContentLoaded', function() {
         'Меню "Фитнес"',
         'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
         9,
-        '.menu .container'
+        '.menu .container',
+        'menu__item'
     ).render();
 
     // 2
@@ -214,7 +208,8 @@ window.addEventListener('DOMContentLoaded', function() {
         'Меню “Премиум”',
         'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
         20,
-        '.menu .container'
+        '.menu .container',
+        'menu__item'
     ).render();
 
     // 3
@@ -224,7 +219,8 @@ window.addEventListener('DOMContentLoaded', function() {
         'Меню "Постное"',
         'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
         16,
-        '.menu .container'
+        '.menu .container',
+        'menu__item'
     ).render();
-
+    
 });
