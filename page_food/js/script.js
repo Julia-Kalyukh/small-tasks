@@ -143,13 +143,13 @@ window.addEventListener('DOMContentLoaded', function() {
 // Использование rest-оператора и параметров по умолчанию
 
     class MenuCard {
-        constructor(src, alt, title, descr, price, parentSelector, ...classes) { // 1 - rest-оператор
+        constructor(src, alt, title, descr, price, parentSelector, ...classes) {
             this.src = src;
             this.alt = alt;
             this.title = title;
             this.descr = descr;
             this.price = price;
-            this.classes = classes; // пустой массив - все равно массив
+            this.classes = classes;
             this.parent = document.querySelector(parentSelector);
             this.transfer = 74; 
             this.changeToRUB();
@@ -163,16 +163,10 @@ window.addEventListener('DOMContentLoaded', function() {
         render(){
             const element = document.createElement('div');
             
-            // 4 - Проверка для назначения дефолтного значения
             if (this.classes.length === 0) {
-                // 5 -  Перезапись пустого массива
                 this.element = 'menu__item';
-                // 6 - Добавление класса по умолчанию
                 element.classList.add(this.element);
             } else {
-                // 2 - Перебор и обработка массива классов
-                // Каждый эл-т массива 'className'
-                // 'element' - новосозданный 'div', обращаемся к его classList и добавляем каждый эл-т из массива
                 this.classes.forEach(className => element.classList.add(className));
             }
             
@@ -189,8 +183,7 @@ window.addEventListener('DOMContentLoaded', function() {
             this.parent.append(element);
         }
     }
-    // 3 - Добавляем класс
-    // 1
+
     new MenuCard(
         'img/tabs/vegy.jpg',
         'vegy',
@@ -201,7 +194,6 @@ window.addEventListener('DOMContentLoaded', function() {
         'menu__item'
     ).render();
 
-    // 2
     new MenuCard(
         'img/tabs/elite.jpg',
         'elite',
@@ -212,7 +204,6 @@ window.addEventListener('DOMContentLoaded', function() {
         'menu__item'
     ).render();
 
-    // 3
     new MenuCard(
         'img/tabs/post.jpg',
         'post',
@@ -222,5 +213,94 @@ window.addEventListener('DOMContentLoaded', function() {
         '.menu .container',
         'menu__item'
     ).render();
+
+
+// Forms
+    
+    // 1 - Получение форм со страницы
+    const forms = document.querySelectorAll('form');
+
+    // 11 - Сообщения при ошибке отправки данных
+    const message = {
+        loading: 'Загрузка',
+        success: 'Спасибо! Мы скоро с вами свяжемся',
+        failure: 'Что-то пошло не так...'
+    };
+
+    // 15 - Привязываем форму к ф-ции
+    forms.forEach(item => {
+        postData(item);
+    });
+
+    // 2 - Ф-ция, отвечающая за постинг данных
+    function postData(form) {
+        // 3 - Вешаем обработчик события на форму
+        form.addEventListener('submit', (e) => { // срабатывает при отправке формы
+            // 4 - Отмена стандартного поведения браузера (перезагрузки стр.)
+            e.preventDefault(); // в AJAX-запросах должна идти первой
+
+            // 12 - При отправке запроса создается новый блок
+            const statusMessage = document.createElement('div');
+            // Добавление класса
+            statusMessage.classList.add('status');
+            // Добавление сообщения при загрузке
+            statusMessage.textContent = message.loading;
+            // Отправка сообщения на страницу
+            form.append(statusMessage);
+
+            // Работа с объектом XMLHttpRequest
+            // 5 - Создание объекта
+            const request = new XMLHttpRequest();
+            // 6 - Вызывается метод open для настройки запроса
+            request.open('POST', 'server.php'); // метод, адрес
+
+            // 7 - Настройка заголовков
+            //request.setRequestHeader('Content-type', 'multipart/form-data');
+                // Content-type - тип контента
+                // multipart/form-data - заголовок согласно док-ции FormDate
+                    // Но когда идет связка XMLHttpRequest и FormData -
+                    // этот заголовок устанавливать не нужно, он уст. автоматически
+            
+            // 7 - Заголовки при JSON
+            request.setRequestHeader('Content-type', 'application/json');
+
+            // 8 - Создание form-data - объект, формирующий данные пользователя
+            const formData = new FormData(form); // конструктор
+                // ! При верстке формы, необходимо, чтобы в инпутах всегда был атрибут 'name',
+                // иначе FormData не сможет сформировать объект со значениями
+
+            // 18 - Перевод FormData в JSON
+            const object = {}; // создание пустого объекта
+            // Перебор FormData и перемещение данных в пустой объект
+            formData.forEach(function(value, key) {
+                object[key] = value;
+            });
+            // Конвертация в JSON
+            const json = JSON.stringify(object); // stringify - переводит объект в JSON
+
+            // 9 - Отправка данных
+            //request.send(formData);
+            request.send(json);
+
+            // 10 - Обработчик события. Отслеживаем конечную загрузку запроса
+            request.addEventListener('load', () => {
+                if (request.status === 200) { // запрос прошел успешно
+                    // Для проверки 
+                     console.log(request.response);
+                    // 13 - Сообщение при загрузке
+                    statusMessage.textContent = message.success;
+                    // 16 - Очистка формы
+                    form.reset();
+                    // 17 - Убрать сообщение через время
+                    setTimeout(() => {
+                        statusMessage.remove();
+                    }, 2000);
+                } else {
+                    // 14 - Сообщение при ошибке
+                    statusMessage.textContent = message.failure;
+                }
+            });
+        }); 
+    }
     
 });
