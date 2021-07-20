@@ -96,11 +96,14 @@ window.addEventListener('DOMContentLoaded', function() {
 // Modal
 
     const modalTrigger = document.querySelectorAll('[data-modal]'),
-          modal = document.querySelector('.modal'),
-          modalCloseBtn = document.querySelector('[data-close]');
+          modal = document.querySelector('.modal');
+          // 7 - Обработчик события не срабатывает на динамически созданных эл-тах
+          // Поэтому используем делегирование событий
 
     function openModal() {
-        modal.classList.toggle('show');
+        //modal.classList.toggle('show'); - toggle ломает окна
+        modal.classList.add('show');
+        modal.classList.remove('hide');
         document.body.style.overflow = 'hidden';
         clearInterval(modalTimeId);
     }
@@ -110,24 +113,26 @@ window.addEventListener('DOMContentLoaded', function() {
     });
 
     function closeModal() {
-        modal.classList.toggle('show');
+        //modal.classList.toggle('show');
+        modal.classList.add('hide');
+        modal.classList.remove('show');
         document.body.style.overflow = '';
     }
-    modalCloseBtn.addEventListener('click', closeModal);
 
     modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
+        // 8 - получаем атрибут data-сlose - если он присутствует, то мы будем закрывать модальное окно
+        if (e.target === modal || e.target.getAttribute('data-close') === "") { 
             closeModal();
         }
     });
 
     document.addEventListener('keydown', (e) => {
-        if (e.code === 'Escape' && modal.classList.contains('show')) {
+        if (e.code === "Escape" && modal.classList.contains('show')) {
             closeModal();
         }
     });
 
-    const modalTimeId = setTimeout(openModal, 3000);
+    const modalTimeId = setTimeout(openModal, 500000);
 
     function showModalByScroll() {
         if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight - 1 ) {
@@ -216,91 +221,93 @@ window.addEventListener('DOMContentLoaded', function() {
 
 
 // Forms
-    
-    // 1 - Получение форм со страницы
-    const forms = document.querySelectorAll('form');
 
-    // 11 - Сообщения при ошибке отправки данных
+    const forms = document.querySelectorAll('form');
     const message = {
-        loading: 'Загрузка',
+        loading: 'img/form/spinner.svg', // картинка загрузки
         success: 'Спасибо! Мы скоро с вами свяжемся',
         failure: 'Что-то пошло не так...'
     };
 
-    // 15 - Привязываем форму к ф-ции
     forms.forEach(item => {
         postData(item);
     });
 
-    // 2 - Ф-ция, отвечающая за постинг данных
     function postData(form) {
-        // 3 - Вешаем обработчик события на форму
-        form.addEventListener('submit', (e) => { // срабатывает при отправке формы
-            // 4 - Отмена стандартного поведения браузера (перезагрузки стр.)
-            e.preventDefault(); // в AJAX-запросах должна идти первой
+        form.addEventListener('submit', (e) => {
+            e.preventDefault(); 
 
-            // 12 - При отправке запроса создается новый блок
-            const statusMessage = document.createElement('div');
-            // Добавление класса
-            statusMessage.classList.add('status');
-            // Добавление сообщения при загрузке
-            statusMessage.textContent = message.loading;
-            // Отправка сообщения на страницу
-            form.append(statusMessage);
+            // 11 - меняем на кртинку вместо сообщения
+            let statusMessage = document.createElement('img');
+            statusMessage.src = message.loading;
+            // CSS-стили
+            statusMessage.style.cssText  = `
+                display: block;
+                margin: 0 auto;
+            `;
+            // Добавляем спиннер после формы
+            form.insertAdjacentElement('afterend', statusMessage);
 
-            // Работа с объектом XMLHttpRequest
-            // 5 - Создание объекта
             const request = new XMLHttpRequest();
-            // 6 - Вызывается метод open для настройки запроса
-            request.open('POST', 'server.php'); // метод, адрес
-
-            // 7 - Настройка заголовков
-            //request.setRequestHeader('Content-type', 'multipart/form-data');
-                // Content-type - тип контента
-                // multipart/form-data - заголовок согласно док-ции FormDate
-                    // Но когда идет связка XMLHttpRequest и FormData -
-                    // этот заголовок устанавливать не нужно, он уст. автоматически
-            
-            // 7 - Заголовки при JSON
+            request.open('POST', 'server.php');
             request.setRequestHeader('Content-type', 'application/json');
+            const formData = new FormData(form);
 
-            // 8 - Создание form-data - объект, формирующий данные пользователя
-            const formData = new FormData(form); // конструктор
-                // ! При верстке формы, необходимо, чтобы в инпутах всегда был атрибут 'name',
-                // иначе FormData не сможет сформировать объект со значениями
-
-            // 18 - Перевод FormData в JSON
-            const object = {}; // создание пустого объекта
-            // Перебор FormData и перемещение данных в пустой объект
+            const object = {};
             formData.forEach(function(value, key) {
                 object[key] = value;
             });
-            // Конвертация в JSON
-            const json = JSON.stringify(object); // stringify - переводит объект в JSON
+            const json = JSON.stringify(object);
 
-            // 9 - Отправка данных
-            //request.send(formData);
             request.send(json);
 
-            // 10 - Обработчик события. Отслеживаем конечную загрузку запроса
             request.addEventListener('load', () => {
-                if (request.status === 200) { // запрос прошел успешно
-                    // Для проверки 
+                if (request.status === 200) {
                      console.log(request.response);
-                    // 13 - Сообщение при загрузке
-                    statusMessage.textContent = message.success;
-                    // 16 - Очистка формы
+                    showThanksModal(message.success); // вызов ф-ции
+                    statusMessage.remove(); // будет использоваться только для спиннера
                     form.reset();
-                    // 17 - Убрать сообщение через время
-                    setTimeout(() => {
-                        statusMessage.remove();
-                    }, 2000);
+                    
                 } else {
-                    // 14 - Сообщение при ошибке
-                    statusMessage.textContent = message.failure;
+                    showThanksModal(message.failure);
                 }
             });
         }); 
     }
-    
+
+    function showThanksModal(message) {
+        // 1 - Получение эл-та
+        const prevModalDialog = document.querySelector('.modal__dialog');
+
+        // 2 - Скрытие эл-та до появления модального окна
+        prevModalDialog.classList.add('hide');
+        // 3 - Открытие
+        openModal();
+
+        // 4 - Создание контента
+        const thanksModal = document.createElement('div');
+        // 5 - Назначение классов
+        thanksModal.classList.add('.modal__dialog');
+        // 6 - Формирование верстки модального окна
+        thanksModal.innerHTML = `
+            <div class="modal__content">
+                <div class="modal__close" data-close>×</div>
+                <div class="modal__title">${message}</div>
+            </div>
+        `;
+
+        // 9 - Размещение верстки на странице
+        document.querySelector('.modal').append(thanksModal);
+
+        // 10 - Необходимо, чтобы через определенное время все возвращалось на свои места
+        setTimeout(() => {
+            // Удаление блока
+            thanksModal.remove();
+            // Показ формы
+            prevModalDialog.classList.add('show');
+            prevModalDialog.classList.remove('hide');
+            // Закрыть модальное окно
+            closeModal();
+        }, 4000);
+    }
 });
