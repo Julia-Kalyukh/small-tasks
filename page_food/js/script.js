@@ -97,11 +97,8 @@ window.addEventListener('DOMContentLoaded', function() {
 
     const modalTrigger = document.querySelectorAll('[data-modal]'),
           modal = document.querySelector('.modal');
-          // 7 - Обработчик события не срабатывает на динамически созданных эл-тах
-          // Поэтому используем делегирование событий
 
     function openModal() {
-        //modal.classList.toggle('show'); - toggle ломает окна
         modal.classList.add('show');
         modal.classList.remove('hide');
         document.body.style.overflow = 'hidden';
@@ -113,14 +110,12 @@ window.addEventListener('DOMContentLoaded', function() {
     });
 
     function closeModal() {
-        //modal.classList.toggle('show');
         modal.classList.add('hide');
         modal.classList.remove('show');
         document.body.style.overflow = '';
     }
 
     modal.addEventListener('click', (e) => {
-        // 8 - получаем атрибут data-сlose - если он присутствует, то мы будем закрывать модальное окно
         if (e.target === modal || e.target.getAttribute('data-close') === "") { 
             closeModal();
         }
@@ -224,7 +219,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
     const forms = document.querySelectorAll('form');
     const message = {
-        loading: 'img/form/spinner.svg', // картинка загрузки
+        loading: 'img/form/spinner.svg',
         success: 'Спасибо! Мы скоро с вами свяжемся',
         failure: 'Что-то пошло не так...'
     };
@@ -237,58 +232,78 @@ window.addEventListener('DOMContentLoaded', function() {
         form.addEventListener('submit', (e) => {
             e.preventDefault(); 
 
-            // 11 - меняем на кртинку вместо сообщения
-            let statusMessage = document.createElement('img');
+            let statusMessage = document.createElement('img'); // спинер
             statusMessage.src = message.loading;
-            // CSS-стили
             statusMessage.style.cssText  = `
                 display: block;
                 margin: 0 auto;
             `;
-            // Добавляем спиннер после формы
+
             form.insertAdjacentElement('afterend', statusMessage);
 
-            const request = new XMLHttpRequest();
-            request.open('POST', 'server.php');
-            request.setRequestHeader('Content-type', 'application/json');
-            const formData = new FormData(form);
+//XMLHttpRequest меняем на fetch
+
+// Fetch API
+// Для тестирования используем JSONPlaceholder
+    // 1. GET-запрос:
+    // fetch('https://jsonplaceholder.typicode.com/todos/1')
+    //     .then(response => response.json()) // обработка json (возвращается промис)
+    //     .then(json => console.log(json)); // после получение объекта его можно использовать
+
+    // 2. POST-запрос:
+    // fetch('https://jsonplaceholder.typicode.com/posts',{ // объект с настройками
+    //         method: "POST",
+    //         body: JSON.stringify({name: 'Alex'}), // можно поместить строку или объект
+    //         headers: { // объект с заголовками
+    //             'Content-type': 'application/json',
+    //         }
+    // })
+    // .then(response => response.json()) // обработка json (возвращается промис)
+    // .then(json => console.log(json)); // после получение объекта его можно использовать
+
+
+
+            const formData = new FormData(form); // собираем все данные из формы
 
             const object = {};
             formData.forEach(function(value, key) {
                 object[key] = value;
             });
-            const json = JSON.stringify(object);
 
-            request.send(json);
-
-            request.addEventListener('load', () => {
-                if (request.status === 200) {
-                     console.log(request.response);
-                    showThanksModal(message.success); // вызов ф-ции
-                    statusMessage.remove(); // будет использоваться только для спиннера
-                    form.reset();
-                    
-                } else {
-                    showThanksModal(message.failure);
-                }
+            // Отправляем данные на сервер
+            fetch('server.php', { // куда
+                method: "POST", // каким образом
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                body: JSON.stringify(object), // что именно (вместо formData)
+            })
+            .then(data => data.text()) // модификация ответа, чтобы увидеть данные
+            .then(data => { // с сервера вернутся данные
+                // операции при положительном исходе
+                console.log(data); // data - данные из промиса (который вернул сервер)
+                showThanksModal(message.success);
+                statusMessage.remove();
+            })
+            .catch(() => { 
+                // операция при ошибке
+                showThanksModal(message.failure);
+            })
+            .finally(() => { // действие, которое выполняется независимо от исхода
+                // очистка формы
+                form.reset();
             });
         }); 
     }
 
     function showThanksModal(message) {
-        // 1 - Получение эл-та
         const prevModalDialog = document.querySelector('.modal__dialog');
 
-        // 2 - Скрытие эл-та до появления модального окна
         prevModalDialog.classList.add('hide');
-        // 3 - Открытие
         openModal();
 
-        // 4 - Создание контента
         const thanksModal = document.createElement('div');
-        // 5 - Назначение классов
         thanksModal.classList.add('.modal__dialog');
-        // 6 - Формирование верстки модального окна
         thanksModal.innerHTML = `
             <div class="modal__content">
                 <div class="modal__close" data-close>×</div>
@@ -296,17 +311,12 @@ window.addEventListener('DOMContentLoaded', function() {
             </div>
         `;
 
-        // 9 - Размещение верстки на странице
         document.querySelector('.modal').append(thanksModal);
 
-        // 10 - Необходимо, чтобы через определенное время все возвращалось на свои места
         setTimeout(() => {
-            // Удаление блока
             thanksModal.remove();
-            // Показ формы
             prevModalDialog.classList.add('show');
             prevModalDialog.classList.remove('hide');
-            // Закрыть модальное окно
             closeModal();
         }, 4000);
     }
