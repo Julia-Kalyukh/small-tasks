@@ -184,59 +184,22 @@ window.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // 4 - Ф-ция для получения карточек
-    const getResourse = async (url) => { // нет data, т.к. мы только получаем данные
-        const res = await fetch(url); // получение данных
+    const getResourse = async (url) => {
+        const res = await fetch(url);
 
-        if (!res.ok) { // когда данные не приходят - ошибка
-            // throw - выкидываем ошибку
-            // если выкидываем ошибку в ручном режиме, то сработает блок кода catch
-        throw new Error(`Could not fetch ${url}, status: ${res.status}`); // объект ошибки с текстом
+        if (!res.ok) {
+        throw new Error(`Could not fetch ${url}, status: ${res.status}`);
         }
 
-        return await res.json(); // обработка данных в объект JS
+        return await res.json();
     };
 
-    // 5 - Построение карточек
-    getResourse('http://localhost:3000/menu') // запуск запроса
+    getResourse('http://localhost:3000/menu')
         .then(data => {
-            data.forEach(({img, altimg, title, descr, price}) => { // синтаксис деструктуризации объекта ({св-во})
-                // будет создаваться столько раз, сколько объектов внутри массива
-                // внутри нужные св-ва объекта и родитель, в который всё будет записываться
+            data.forEach(({img, altimg, title, descr, price}) => {
                 new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
             });
         });
-
-                // // 2 вариант динамического создания элементов на странице
-                // // Используется когда не нужна шаблонизация и нужно один раз что-то построить
-
-                // getResourse('http://localhost:3000/menu')
-                //     .then(data => createCard(data));
-
-                // // Ф-ция построения карточек
-                // function createCard(data) { // принимает данные с сервера (массив из db)
-                //     data.forEach(({img, altimg, title, descr, price}) => { // перебор массива
-                //         // создание эл-тов без шаблона
-                //         const element = document.createElement('div');
-                //         // добавляем класс
-                //         element.classList.add('menu__item');
-
-                //         // внутри этого эл-та помещается вёрстка
-                //         element.innerHTML = `
-                //             <img src=${img} alt=${altimg}>
-                //             <h3 class="menu__item-subtitle">${title}</h3>
-                //             <div class="menu__item-descr">${descr}</div>
-                //             <div class="menu__item-divider"></div>
-                //             <div class="menu__item-price">
-                //                 <div class="menu__item-cost">Цена:</div>
-                //                 <div class="menu__item-total"><span>${price}</span> руб/день</div>
-                //             </div>
-                //         `;
-
-                //         // помещение эл-та на страницу
-                //         document.querySelector('.menu .container').append(element);
-                //     });
-                // }
 
 // Forms
 
@@ -248,17 +211,11 @@ window.addEventListener('DOMContentLoaded', function() {
     };
 
     forms.forEach(item => {
-        bindPostData(item); // переимнование ф-ции
+        bindPostData(item);
     });
 
-    // 1 - Вынос функционала по общению с сервером в отдельную ф-цию
-
-    // Function Expression - создается в потоке кода и присваивается в переменную
-    const postData = async (url, data) => { // отвечает за постинг данных (когда отпр. на сервер)
-                                            // async - внутри асинхронный код
-
-        // в переменную помещаем промис, который возвращается от fetch
-        const res = await fetch(url, { // await - парный оператор, ставим перед теми операциями, кот. нужно дождаться
+    const postData = async (url, data) => { 
+        const res = await fetch(url, {
             method: "POST",
                 headers: {
                     'Content-type': 'application/json'
@@ -266,11 +223,10 @@ window.addEventListener('DOMContentLoaded', function() {
                 body: data
         });
 
-        // обработка res(промиса) в JS-объект
         return await res.json();
     };
 
-    function bindPostData(form) { // переименование ф-ции (отвечает за привязку постинга)
+    function bindPostData(form) {
         form.addEventListener('submit', (e) => {
             e.preventDefault(); 
 
@@ -285,15 +241,9 @@ window.addEventListener('DOMContentLoaded', function() {
 
             const formData = new FormData(form);
 
-            // 3 - Новый метод преобразования данных из формы в json
-                // entries - возвращает массив собственных перечисляемых св-в указанного объекта (массивы в массиве), (обращение к formData, а не object)
-                // + преобразование массива с массивами обратно в объект (обращение к объекту, а не formData)
-                // + объект превращается в JSON
             const json = JSON.stringify(Object.fromEntries(formData.entries()));
 
-            // 2 - Использование ф-ции постинга данных
-            postData('http://localhost:3000/requests', json) // адрес json-server, переменная json
-                    // модификация данных перенесена в ф-цию
+            postData('http://localhost:3000/requests', json)
             .then(data => {
                 console.log(data);
                 showThanksModal(message.success);
@@ -332,6 +282,68 @@ window.addEventListener('DOMContentLoaded', function() {
             closeModal();
         }, 4000);
     }
+
+    
+// Slider
+
+    // 1 - Получение элементов
+    const slides = document.querySelectorAll('.offer__slide'),
+          prev = document.querySelector('.offer__slider-prev'),
+          next = document.querySelector('.offer__slider-next'),
+          total = document.querySelector('#total'),
+          current = document. querySelector('#current');
+    // 2 - Индекс, который будет определять текущее положение в слайдере
+    let slideIndex = 1;
+
+    // 6 - Инициализация слайда
+    showSlides(slideIndex);
+
+    // 7 - Условие для отображения 0 на странице (01 или 04) - общ кол-во слайдов
+     // Выносится отдельным условием, чтобы общее количество слайдов
+     // не мигало при переключении слайда (обновлении ф-ции показа слайдов)
+    if (slides.length < 10) { 
+        total.textContent = `0${slides.length}`;
+    } else {
+        total.textContent = slides.length;
+    }
+
+    // 3 - Ф-ция показа и скрытия слайдов
+    function showSlides(n) {
+        // Граничные значения (переход из 4 слайда в 1)
+        if (n > slides.length) { // если slideIndex > кол-во слайдов, то
+            slideIndex = 1;
+        }
+
+        // Переход из 1 слайда в 4
+        if (n < 1) {
+            slideIndex = slides.length; // последний эл-т в слайдере
+        }
+
+        // Скрытие всех слайдов
+        slides.forEach((item) => item.style.display = 'none'); 
+        // Показ нужного слайда
+        slides[slideIndex - 1].style.display = 'block'; // показ 0-вого слайда из массива
+
+        // 8 - Условие для отображения текущего количества слайдов
+        if (slides.length < 10) { 
+            current.textContent = `0${slideIndex}`;
+        } else {
+            current.textContent = slideIndex;
+        }
+    }
+    
+    // 4 - Смена slideIndex при листании слайдов
+    function plusSlides(n) {
+        showSlides(slideIndex += n);
+    }
+
+    // 5 - Назначение обработчиков событий
+    prev.addEventListener('click', () => {
+        plusSlides(-1); // при нажатии на prev будет -1
+    });
+    next.addEventListener('click', () => {
+        plusSlides(+1); // при нажатии на next будет +1
+    });
 });
 
 // Запуск json-server в терминале:
