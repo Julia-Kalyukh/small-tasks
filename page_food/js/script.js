@@ -184,36 +184,59 @@ window.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    new MenuCard(
-        'img/tabs/vegy.jpg',
-        'vegy',
-        'Меню "Фитнес"',
-        'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
-        9,
-        '.menu .container',
-        'menu__item'
-    ).render();
+    // 4 - Ф-ция для получения карточек
+    const getResourse = async (url) => { // нет data, т.к. мы только получаем данные
+        const res = await fetch(url); // получение данных
 
-    new MenuCard(
-        'img/tabs/elite.jpg',
-        'elite',
-        'Меню “Премиум”',
-        'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
-        20,
-        '.menu .container',
-        'menu__item'
-    ).render();
+        if (!res.ok) { // когда данные не приходят - ошибка
+            // throw - выкидываем ошибку
+            // если выкидываем ошибку в ручном режиме, то сработает блок кода catch
+        throw new Error(`Could not fetch ${url}, status: ${res.status}`); // объект ошибки с текстом
+        }
 
-    new MenuCard(
-        'img/tabs/post.jpg',
-        'post',
-        'Меню "Постное"',
-        'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
-        16,
-        '.menu .container',
-        'menu__item'
-    ).render();
+        return await res.json(); // обработка данных в объект JS
+    };
 
+    // 5 - Построение карточек
+    getResourse('http://localhost:3000/menu') // запуск запроса
+        .then(data => {
+            data.forEach(({img, altimg, title, descr, price}) => { // синтаксис деструктуризации объекта ({св-во})
+                // будет создаваться столько раз, сколько объектов внутри массива
+                // внутри нужные св-ва объекта и родитель, в который всё будет записываться
+                new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
+            });
+        });
+
+                // // 2 вариант динамического создания элементов на странице
+                // // Используется когда не нужна шаблонизация и нужно один раз что-то построить
+
+                // getResourse('http://localhost:3000/menu')
+                //     .then(data => createCard(data));
+
+                // // Ф-ция построения карточек
+                // function createCard(data) { // принимает данные с сервера (массив из db)
+                //     data.forEach(({img, altimg, title, descr, price}) => { // перебор массива
+                //         // создание эл-тов без шаблона
+                //         const element = document.createElement('div');
+                //         // добавляем класс
+                //         element.classList.add('menu__item');
+
+                //         // внутри этого эл-та помещается вёрстка
+                //         element.innerHTML = `
+                //             <img src=${img} alt=${altimg}>
+                //             <h3 class="menu__item-subtitle">${title}</h3>
+                //             <div class="menu__item-descr">${descr}</div>
+                //             <div class="menu__item-divider"></div>
+                //             <div class="menu__item-price">
+                //                 <div class="menu__item-cost">Цена:</div>
+                //                 <div class="menu__item-total"><span>${price}</span> руб/день</div>
+                //             </div>
+                //         `;
+
+                //         // помещение эл-та на страницу
+                //         document.querySelector('.menu .container').append(element);
+                //     });
+                // }
 
 // Forms
 
@@ -225,14 +248,33 @@ window.addEventListener('DOMContentLoaded', function() {
     };
 
     forms.forEach(item => {
-        postData(item);
+        bindPostData(item); // переимнование ф-ции
     });
 
-    function postData(form) {
+    // 1 - Вынос функционала по общению с сервером в отдельную ф-цию
+
+    // Function Expression - создается в потоке кода и присваивается в переменную
+    const postData = async (url, data) => { // отвечает за постинг данных (когда отпр. на сервер)
+                                            // async - внутри асинхронный код
+
+        // в переменную помещаем промис, который возвращается от fetch
+        const res = await fetch(url, { // await - парный оператор, ставим перед теми операциями, кот. нужно дождаться
+            method: "POST",
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                body: data
+        });
+
+        // обработка res(промиса) в JS-объект
+        return await res.json();
+    };
+
+    function bindPostData(form) { // переименование ф-ции (отвечает за привязку постинга)
         form.addEventListener('submit', (e) => {
             e.preventDefault(); 
 
-            let statusMessage = document.createElement('img'); // спинер
+            let statusMessage = document.createElement('img');
             statusMessage.src = message.loading;
             statusMessage.style.cssText  = `
                 display: block;
@@ -241,56 +283,26 @@ window.addEventListener('DOMContentLoaded', function() {
 
             form.insertAdjacentElement('afterend', statusMessage);
 
-//XMLHttpRequest меняем на fetch
+            const formData = new FormData(form);
 
-// Fetch API
-// Для тестирования используем JSONPlaceholder
-    // 1. GET-запрос:
-    // fetch('https://jsonplaceholder.typicode.com/todos/1')
-    //     .then(response => response.json()) // обработка json (возвращается промис)
-    //     .then(json => console.log(json)); // после получение объекта его можно использовать
+            // 3 - Новый метод преобразования данных из формы в json
+                // entries - возвращает массив собственных перечисляемых св-в указанного объекта (массивы в массиве), (обращение к formData, а не object)
+                // + преобразование массива с массивами обратно в объект (обращение к объекту, а не formData)
+                // + объект превращается в JSON
+            const json = JSON.stringify(Object.fromEntries(formData.entries()));
 
-    // 2. POST-запрос:
-    // fetch('https://jsonplaceholder.typicode.com/posts',{ // объект с настройками
-    //         method: "POST",
-    //         body: JSON.stringify({name: 'Alex'}), // можно поместить строку или объект
-    //         headers: { // объект с заголовками
-    //             'Content-type': 'application/json',
-    //         }
-    // })
-    // .then(response => response.json()) // обработка json (возвращается промис)
-    // .then(json => console.log(json)); // после получение объекта его можно использовать
-
-
-
-            const formData = new FormData(form); // собираем все данные из формы
-
-            const object = {};
-            formData.forEach(function(value, key) {
-                object[key] = value;
-            });
-
-            // Отправляем данные на сервер
-            fetch('server.php', { // куда
-                method: "POST", // каким образом
-                headers: {
-                    'Content-type': 'application/json'
-                },
-                body: JSON.stringify(object), // что именно (вместо formData)
-            })
-            .then(data => data.text()) // модификация ответа, чтобы увидеть данные
-            .then(data => { // с сервера вернутся данные
-                // операции при положительном исходе
-                console.log(data); // data - данные из промиса (который вернул сервер)
+            // 2 - Использование ф-ции постинга данных
+            postData('http://localhost:3000/requests', json) // адрес json-server, переменная json
+                    // модификация данных перенесена в ф-цию
+            .then(data => {
+                console.log(data);
                 showThanksModal(message.success);
                 statusMessage.remove();
             })
             .catch(() => { 
-                // операция при ошибке
                 showThanksModal(message.failure);
             })
-            .finally(() => { // действие, которое выполняется независимо от исхода
-                // очистка формы
+            .finally(() => {
                 form.reset();
             });
         }); 
@@ -321,3 +333,6 @@ window.addEventListener('DOMContentLoaded', function() {
         }, 4000);
     }
 });
+
+// Запуск json-server в терминале:
+// npx json-server db.json
