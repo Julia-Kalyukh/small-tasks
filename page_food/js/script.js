@@ -286,64 +286,98 @@ window.addEventListener('DOMContentLoaded', function() {
     
 // Slider
 
-    // 1 - Получение элементов
+    let offset = 0; // Отступ 
+    let slideIndex = 1;
+
     const slides = document.querySelectorAll('.offer__slide'),
           prev = document.querySelector('.offer__slider-prev'),
           next = document.querySelector('.offer__slider-next'),
           total = document.querySelector('#total'),
-          current = document. querySelector('#current');
-    // 2 - Индекс, который будет определять текущее положение в слайдере
-    let slideIndex = 1;
-
-    // 6 - Инициализация слайда
-    showSlides(slideIndex);
-
-    // 7 - Условие для отображения 0 на странице (01 или 04) - общ кол-во слайдов
+          current = document. querySelector('#current'),
+          // 1 - Получение дополнительных элементов
+          slidesWrapper = document.querySelector('.offer__slider-wrapper'), // обложка для слайдов
+          slidesField = document.querySelector('.offer__slider-inner'), // поле со слайдами
+          // узнаем ширину видимого блока
+          width = window.getComputedStyle(slidesWrapper).width; // вернется объект со свойствами, достаем св-во width
+    
+    // Условие для отображения 0 на странице (01 или 04) - общ кол-во слайдов
      // Выносится отдельным условием, чтобы общее количество слайдов
      // не мигало при переключении слайда (обновлении ф-ции показа слайдов)
-    if (slides.length < 10) { 
+     if (slides.length < 10) { 
         total.textContent = `0${slides.length}`;
+        current.textContent = `0${slideIndex}`;
     } else {
         total.textContent = slides.length;
+        current.textContent = `0${slideIndex}`;
     }
 
-    // 3 - Ф-ция показа и скрытия слайдов
-    function showSlides(n) {
-        // Граничные значения (переход из 4 слайда в 1)
-        if (n > slides.length) { // если slideIndex > кол-во слайдов, то
+    // 2 - Узнаем ширину блока со слайдами
+    slidesField.style.width = 100 * slides.length + '%'; // для CSS-стилей нужны единицы измерения
+    // 4 - Выстраивание слайдов
+    slidesField.style.display = 'flex';
+    // 5 - Плавное движение слайдов
+    slidesField.style.transition = '0.5s all';
+    
+    // 6 - Показ только 1 слайда
+    slidesWrapper.style.overflow = 'hidden';
+
+    // 3 - Установка фиксированной ширины всем слайдам
+    slides.forEach(slide => {
+        slide.style.width = width;
+    });
+
+    // 7 - Обработчик события чтобы передвигать слайды
+    next.addEventListener('click', () => {
+        // переход с 4 слайда на 1
+        if (offset == (+width.slice(0, width.length - 2) * (slides.length - 1))) {
+            offset = 0;
+        } else {
+            //  прокрутка вперед
+            offset += +width.slice(0, width.length - 2);
+        }
+
+        slidesField.style.tansform = `translateX(-${offset}px)`;
+
+        // Обновление счетчика слайдов
+        if (slideIndex == slides.length) {
             slideIndex = 1;
+        } else {
+            slideIndex++;
         }
-
-        // Переход из 1 слайда в 4
-        if (n < 1) {
-            slideIndex = slides.length; // последний эл-т в слайдере
-        }
-
-        // Скрытие всех слайдов
-        slides.forEach((item) => item.style.display = 'none'); 
-        // Показ нужного слайда
-        slides[slideIndex - 1].style.display = 'block'; // показ 0-вого слайда из массива
-
-        // 8 - Условие для отображения текущего количества слайдов
-        if (slides.length < 10) { 
+        // Запись обновления
+        if (slides.length <10) {
             current.textContent = `0${slideIndex}`;
         } else {
             current.textContent = slideIndex;
         }
-    }
-    
-    // 4 - Смена slideIndex при листании слайдов
-    function plusSlides(n) {
-        showSlides(slideIndex += n);
-    }
 
-    // 5 - Назначение обработчиков событий
+    });
+
     prev.addEventListener('click', () => {
-        plusSlides(-1); // при нажатии на prev будет -1
+        // переход с 1 слайда на 4
+        if (offset == 0){
+            offset = +width.slice(0, width.length - 2) * (slides.length - 1);
+        } else {
+            //  прокрутка вперед
+            offset -= +width.slice(0, width.length - 2);
+        }
+
+        slidesField.style.tansform = `translateX(-${offset}px)`;
+
+        // Обновление счетчика слайдов
+        if (slideIndex == 1) {
+            slideIndex = slides.length;
+        } else {
+            slideIndex--;
+        }
+        // Запись обновления
+        if (slides.length <10) {
+            current.textContent = `0${slideIndex}`;
+        } else {
+            current.textContent = slideIndex;
+        }
     });
-    next.addEventListener('click', () => {
-        plusSlides(+1); // при нажатии на next будет +1
-    });
+
 });
 
 // Запуск json-server в терминале:
