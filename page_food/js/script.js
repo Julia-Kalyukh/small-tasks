@@ -299,7 +299,6 @@ window.addEventListener('DOMContentLoaded', function() {
           width = window.getComputedStyle(slidesWrapper).width,
           slidesField = document.querySelector('.offer__slider-inner');
 
-    // Условие для отображения 0 в счетчике слайдов (01 или 04)
     function getZeroSlideIndex () {
         if (slides.length < 10) {
             total.textContent = `0${slides.length}`;
@@ -311,7 +310,6 @@ window.addEventListener('DOMContentLoaded', function() {
     }
     getZeroSlideIndex();
 
-    // Показ слайда в окне
     function showSlideWindow () {
         slidesField.style.width = 100 * slides.length + '%';
         slidesField.style.display = 'flex';
@@ -324,23 +322,19 @@ window.addEventListener('DOMContentLoaded', function() {
     }
     showSlideWindow();
 
-    // Ф-ция назначение прозрачности  на эл-ты
     function addActivityClass (dots) {
-        dots.forEach(dot => dot.style.opacity = ".5"); // назначение прозрачности  на все эл-ты
-        dots[slideIndex-1].style.opacity = 1; // назначение прозрачности  на текущий эл-т
+        dots.forEach(dot => dot.style.opacity = ".5");
+        dots[slideIndex-1].style.opacity = 1;
     }
 
-    // Сдвиг слайда
     function transformSlide (){
         slidesField.style.transform = `translateX(-${offset}px)`;
     }
 
-    // Ф-ция с исп. регулярных выражений
     function deleteNotDigits(str) {
         return +str.replace(/\D/g, '');
     }
 
-    // Создание обертки для всех точек
     const indicators = document.createElement('ol'),
           dots = [];
     indicators.classList.add('carousel-indicators');
@@ -360,7 +354,6 @@ window.addEventListener('DOMContentLoaded', function() {
     
     slider.append(indicators);
 
-    // Создание точек (кол-во точек = кол-ву слайдов)
     for (let i = 0; i < slides.length; i++) {
         
         const dot = document.createElement('li');
@@ -445,6 +438,93 @@ window.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+
+// Calc
+    
+    const result = document.querySelector('.calculating__result span'); // переменная с рез-том вычислений
+    // Объявление необходимых для калькулятора переменных
+    let sex = 'female', // дефолтное значение
+        height, weight, age, 
+        ratio = 1.375; // невысокая активность
+
+    // Ф-ция для подсчета конечного результата
+    function calcTotal() {
+        // Проверка на заполненность всех значений
+        if (!sex || !height || !weight || !age || !ratio) {
+            result.textContent = '____';
+            return; // для досрочного прерывания ф-ции 
+        }
+
+        // Условие в зависимости от выбранного пола
+        if (sex ===  'female') {
+            result.textContent = Math.round((447.6 + (9.2 * weight) + (3.1 * height) - (4.3 * age)) * ratio); 
+        } else {
+            result.textContent = Math.round((88.36 + (13.4 * weight) + (4.8 * height) - (5.7 * age)) * ratio);
+        }
+    }
+    
+    // Ф-ция по получению данных со статического контента
+    function getStaticInformation (parentSelector, activeClass) { // Родительский эл-т, класс активности
+        // Получение эл-тов
+        const elements = document.querySelectorAll(`${parentSelector } div`); // получение всех div-вов внутри этого родителя
+
+        // Отслеживание кликов по родительскому эл-ту с помощью делегирования событий даёт баги
+        // document.querySelector(parentSelector).addEventListener('click', (e) => { // на род. блок навашивается обработчик события
+
+        // Поэтому обработчик события вешается на каждый эл-т отдельно
+        elements.forEach(elem => {
+            elem.addEventListener('click', (e) => { // на род. блок навашивается обработчик события
+                if (e.target.getAttribute('data-ratio')) {
+                    ratio = +e.target.getAttribute('data-ratio'); // вытаскиваем значение ratio у e.target
+                } else { // если нет 'data-ratio', то срабатвает пол
+                    sex = e.target.getAttribute('id');
+                }
+
+                // Работа с классами активности
+                // сначала перебор всех эл-тов и удаление класса активности
+                elements.forEach(elem => { 
+                    elem.classList.remove(activeClass);
+                }); 
+
+                // назанчение класса активности только нужному эл-ту
+                e.target.classList.add(activeClass);
+
+                // Вызов ф-ции для пересчета при изменении данных
+                calcTotal();
+            });
+        });
+    }
+
+    // Запуск функции 
+    getStaticInformation('#gender', 'calculating__choose-item_active'); // запуск для пола
+    getStaticInformation('.calculating__choose_big', 'calculating__choose-item_active'); // для активности
+    
+    // Ф-ция для обработки инпутов
+    function  getDynamicInformation (selector ) {
+        // Получение инпута
+        const  input = document.querySelector(selector);
+
+        // Обработчик события на input
+        input.addEventListener('input', () => {
+            switch(input.getAttribute('id')){
+                 case 'height':
+                     height = +input.value;
+                     break;
+                case 'weight':
+                    weight = +input.value;
+                    break;
+                case 'age':
+                    age = +input.value;
+                    break;
+            }
+            calcTotal(); 
+        });
+    }
+ 
+    // Запуск функции с разными селекторами
+    getDynamicInformation('#height');
+    getDynamicInformation('#weight');
+    getDynamicInformation('#age'); 
 });
 
 // Запуск json-server в терминале:
