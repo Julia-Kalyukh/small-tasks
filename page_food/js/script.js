@@ -205,7 +205,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
     const forms = document.querySelectorAll('form');
     const message = {
-        loading: 'img/form/spinner.svg',
+        loading: 'img/loading/spinner.svg',
         success: 'Спасибо! Мы скоро с вами свяжемся',
         failure: 'Что-то пошло не так...'
     };
@@ -441,21 +441,50 @@ window.addEventListener('DOMContentLoaded', function() {
 
 // Calc
     
-    const result = document.querySelector('.calculating__result span'); // переменная с рез-том вычислений
-    // Объявление необходимых для калькулятора переменных
-    let sex = 'female', // дефолтное значение
-        height, weight, age, 
-        ratio = 1.375; // невысокая активность
+    const result = document.querySelector('.calculating__result span');
+    let sex, height, weight, age, ratio;
+
+    // Условие - если в localStorage хранятся данные, то по умолчанию исп. их
+    if (localStorage.getItem('sex')) {
+        sex = localStorage.getItem('sex'); 
+    } else {
+         sex = 'female';
+         localStorage.setItem('sex', 'female'); // запись в БД значения, кот. пригодится в будущем
+    }
+
+    if (localStorage.getItem('ratio')) {
+        ratio = localStorage.getItem('ratio'); 
+    } else {
+         ratio = 'female';
+         localStorage.setItem('ratio', 1.375);
+    }
+
+    // Ф-ция раб. с класами активности, основываясь на данных localStorage
+        function initLocalSettings(selector, activeClass) {
+        const elements = document.querySelectorAll(selector);
+
+        elements.forEach(elem => {
+            elem.classList.remove(activeClass);
+            if (elem.getAttribute('id') === localStorage.getItem('sex')) {
+                elem.classList.add(activeClass);
+            }
+            if (elem.getAttribute('data-ratio') === localStorage.getItem('ratio')) {
+                elem.classList.add(activeClass);
+            }
+        });
+    }
+
+    // '#gender div' - добавляем див, тк мы обращаемся к блокам, которые находятся внутри селектора 
+    initLocalSettings('#gender div', 'calculating__choose-item_active');
+    initLocalSettings('.calculating__choose_big div', 'calculating__choose-item_active');
 
     // Ф-ция для подсчета конечного результата
     function calcTotal() {
-        // Проверка на заполненность всех значений
         if (!sex || !height || !weight || !age || !ratio) {
-            result.textContent = '____';
-            return; // для досрочного прерывания ф-ции 
+            result.innerHTML = `<img src="img/loading/spinner_result.svg" alt="loading">`;
+            return;
         }
 
-        // Условие в зависимости от выбранного пола
         if (sex ===  'female') {
             result.textContent = Math.round((447.6 + (9.2 * weight) + (3.1 * height) - (4.3 * age)) * ratio); 
         } else {
@@ -464,48 +493,47 @@ window.addEventListener('DOMContentLoaded', function() {
     }
     
     // Ф-ция по получению данных со статического контента
-    function getStaticInformation (parentSelector, activeClass) { // Родительский эл-т, класс активности
-        // Получение эл-тов
-        const elements = document.querySelectorAll(`${parentSelector } div`); // получение всех div-вов внутри этого родителя
+    function getStaticInformation (selector, activeClass) {
+        const elements = document.querySelectorAll(`${selector } div`);
 
-        // Отслеживание кликов по родительскому эл-ту с помощью делегирования событий даёт баги
-        // document.querySelector(parentSelector).addEventListener('click', (e) => { // на род. блок навашивается обработчик события
-
-        // Поэтому обработчик события вешается на каждый эл-т отдельно
         elements.forEach(elem => {
-            elem.addEventListener('click', (e) => { // на род. блок навашивается обработчик события
+            elem.addEventListener('click', (e) => { 
                 if (e.target.getAttribute('data-ratio')) {
-                    ratio = +e.target.getAttribute('data-ratio'); // вытаскиваем значение ratio у e.target
-                } else { // если нет 'data-ratio', то срабатвает пол
+                    ratio = +e.target.getAttribute('data-ratio'); 
+                    // Когда записывается коэффициент активности, то обращаемся к localStorage
+                    localStorage.setItem('ratio', ratio);
+                } else {
                     sex = e.target.getAttribute('id');
+                    localStorage.setItem('sex', sex); 
                 }
 
                 // Работа с классами активности
-                // сначала перебор всех эл-тов и удаление класса активности
-                elements.forEach(elem => { 
+                elements.forEach(elem => {
                     elem.classList.remove(activeClass);
-                }); 
-
-                // назанчение класса активности только нужному эл-ту
+                });
+    
                 e.target.classList.add(activeClass);
-
                 // Вызов ф-ции для пересчета при изменении данных
                 calcTotal();
             });
-        });
+        }); 
     }
 
-    // Запуск функции 
-    getStaticInformation('#gender', 'calculating__choose-item_active'); // запуск для пола
-    getStaticInformation('.calculating__choose_big', 'calculating__choose-item_active'); // для активности
+    getStaticInformation('#gender', 'calculating__choose-item_active');
+    getStaticInformation('.calculating__choose_big', 'calculating__choose-item_active');
     
     // Ф-ция для обработки инпутов
     function  getDynamicInformation (selector ) {
-        // Получение инпута
         const  input = document.querySelector(selector);
 
-        // Обработчик события на input
+        // Подсветка неверно введенных инпутов
         input.addEventListener('input', () => {
+            if (input.value.match(/\D/g)) { // если ввели не цифры
+                input.style.border = '1px solid red'; 
+            } else {
+                 input.style.border = 'none';
+            }
+
             switch(input.getAttribute('id')){
                  case 'height':
                      height = +input.value;
@@ -521,7 +549,6 @@ window.addEventListener('DOMContentLoaded', function() {
         });
     }
  
-    // Запуск функции с разными селекторами
     getDynamicInformation('#height');
     getDynamicInformation('#weight');
     getDynamicInformation('#age'); 
