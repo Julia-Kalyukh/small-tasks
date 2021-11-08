@@ -15,7 +15,7 @@ window.addEventListener('DOMContentLoaded', function() {
     cards();
     forms('form', modalTimeId);
     modal('[data-modal]', '.modal', modalTimeId);
-    timer('.timer', '2021-09-15 00:00:00 GMT+0300');
+    timer('.timer', '2021/12/31 23:59:59 GMT+0300');
     tabs('.tabheader__item', '.tabcontent', '.tabheader__items', 'tabheader__item_active');
     slider({
         slide: '.offer__slide',
@@ -28,9 +28,3 @@ window.addEventListener('DOMContentLoaded', function() {
         wrapper: '.offer__slider-wrapper'
     });
 });
-
-// Запуск json-server в терминале:
-// npx json-server db.json
-
-// Запуск webpack:
-// npx webpack
