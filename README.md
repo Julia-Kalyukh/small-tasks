@@ -1,7 +1,7 @@
 
 # ◈ appMovieDB
 
-[Demo ▶](https://appmovie.yuliyakalyukh.ru) 
+[Demo ▻](https://appmovie.yuliyakalyukh.ru) 
 
 ## Приложение собирает следующие данные:
 <ul>
@@ -24,7 +24,7 @@
 
 # ◈ page_food
 
-[Demo ▶](food.yuliyakalyukh.ru)
+[Demo ▻](food.yuliyakalyukh.ru)
 
 ### Создан таймер на странице
 - Созданы функции: устанавливающая таймер и обновляющая таймер
@@ -61,7 +61,7 @@
 <p align="center">⬥ ⬥ ⬥</p>
 
 # ◈ page_movieDB
- [Demo ▶](https://movie.yuliyakalyukh.ru)
+ [Demo ▻](https://movie.yuliyakalyukh.ru)
 
 ## Работа с элементами на странице:
 - Удалить все рекламные блоки со страницы
@@ -79,11 +79,6 @@
 - Фильмы сортируются по алфавиту
 
 ### Исходник
-![sours](https://photos.app.goo.gl/ZbKWc4J1HVEnRtcD8)
+![Image alt](https://github.com/Julia-Kalyukh/JS_projects/raw/master/page_movieDB/img/source_pageMovie.png)
 
 <p align="center">⬥ ⬥ ⬥</p>
-
-
-
-
-
