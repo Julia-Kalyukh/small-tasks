@@ -39,7 +39,7 @@ function getSum(hand) {
 }
 
 function getStatus() {
-    return 'Дилер: ' + dealer.join(' ') + ' Игрок: ' + player.join(' ') + '.';
+    return 'Дилер: ' + dealer.join(' ') + '\n' + 'Игрок: ' + player.join(' ');
 }
 
 var dealer = [getCard()];
@@ -47,11 +47,11 @@ var player = [getCard(), getCard()];
 
 //Проверка на Black Jack после раздачи
 if (getSum(player) == 21) {
-    alert('Black Jack на раздаче! $_$ ');
+    alert('Black Jack на раздаче! 🤡 \n');
 } else {
     var answer = '';
     do {
-        answer = +prompt(getStatus() + ' Хотите еще карту? 1 - да, иначе - нет');
+        answer = +prompt(getStatus() + '\n \nХотите еще карту? \n1 - да \nиначе - нет');
 
         //Cдаем карту игроку или прекращаем игру
         if (answer == 1) {
@@ -60,10 +60,10 @@ if (getSum(player) == 21) {
             //Проверяем, нет ли перебора или выигрыша
             sum = getSum(player);
             if (sum > 21) {
-                alert('Перебор Х_Х ' + getStatus());
+                alert('Перебор ❌ \n' + getStatus());
                 break;
             } else if (sum == 21) {
-                alert('Black Jack! ' + getStatus());
+                alert('Black Jack! 🤩 \n' + getStatus());
                 break;
                 // Игрок закончил брать карты
             }
@@ -77,15 +77,15 @@ if (getSum(player) == 21) {
             var sumPlayer = getSum(player);
 
             if (sumDealer == 21) {
-                alert('У Дилера Black Jack! ' + getStatus());
+                alert('У Дилера Black Jack! 🤡 \n' + getStatus());
             } else if (sumDealer > 21) {
-                alert('У Дилера перебор! ' + getStatus());
+                alert('У Дилера перебор! 🥳 \n' + getStatus());
             } else if (sumDealer == sumPlayer) {
-                alert('Ничья! ' + getStatus());
+                alert('Ничья! 🤭 \n' + getStatus());
             } else if (sumPlayer > sumDealer) {
-                alert('Вы победили! :) ' + getStatus());
+                alert('Вы победили! 🤓 \n) ' + getStatus());
             } else {
-                alert('Вы проиграли! :( ' + getStatus());
+                alert('Вы проиграли! 💸 \n' + getStatus());
             }
         }
     } while (answer == 1);
