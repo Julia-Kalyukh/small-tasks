@@ -79,6 +79,4 @@
 - Фильмы сортируются по алфавиту
 
 ### Исходник
-![Image alt](https://github.com/Julia-Kalyukh/JS_projects/blob/main/page_movieDB/source_pageMovie.png)
-
-<p align="center">⬥ ⬥ ⬥</p>
+![Image alt](https://github.com/Julia-Kalyukh/JS_projects/blob/main/page_movieDB/img/source_pageMovie.png)
