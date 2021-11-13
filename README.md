@@ -24,7 +24,7 @@
 
 # ◈ page_food
 
-[Demo ▻](food.yuliyakalyukh.ru)
+[Demo ▻](https://food.yuliyakalyukh.ru)
 
 ### Создан таймер на странице
 - Созданы функции: устанавливающая таймер и обновляющая таймер
