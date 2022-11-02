@@ -1,3 +1,4 @@
+// Генерирует посты
 function createContent(id, title, text) {
 
   let html = `<div class="content" id="${id}">

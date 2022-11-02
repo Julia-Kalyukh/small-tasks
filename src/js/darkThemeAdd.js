@@ -1,5 +1,5 @@
+// Включает темную тему по чекбоксу
 function darkThemeAdd() {
-
   let contentBox = document.querySelectorAll('.content');
 
   contentBox.forEach((item) => {

@@ -1,13 +1,18 @@
 function launchSearchValue() {
   let search = document.querySelector('.js-input-search'),
+    // Значение input
     value = search.value,
+    // передаем параметр в адресную строку
     newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + `?search=${value}`;
 
+  // новый адрес
   window.history.pushState({ path: newurl }, "", newurl);
 
   if (value) {
+    // Очищаем контейнер с постами 
     document.querySelector('.js-container-content').innerHTML = '';
-    searchStart(value);
+    // Запускаем поиск
+    searchStart(value);  //  file: searchStart.js
   } else {
     document.querySelector('.js-container-content').innerHTML = "Введите значение";
   }

@@ -1,3 +1,4 @@
+// Загрузка первых семи постов
 function loadingFirst() {
   (async () => {
 
@@ -12,10 +13,10 @@ function loadingFirst() {
           text = i.body;
 
         createContent(id, title, text); // file: createContent.js
-        searchClick();
+        searchClick();                  // file: search/searchClick.js
       });
 
-      await darkThemeAdd();
+      await darkThemeAdd();             // file: darkThemeAdd.js
 
     } catch (err) {
       alert(err); // TypeError: failed to fetch

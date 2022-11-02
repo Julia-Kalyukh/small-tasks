@@ -1,3 +1,4 @@
+// Функция получает JSON-файл и перебирает массив
 function searchStart(valueSearch) {
 
   (async () => {
@@ -7,20 +8,22 @@ function searchStart(valueSearch) {
 
       searchData.forEach((t) => {
 
-        let idr = t.id,
-          titler = t.title,
-          textr = t.body;
+        let id = t.id,
+          title = t.title,
+          text = t.body;
 
-        let titleSearch = titler.includes(valueSearch);
+        // Если в заголовке есть передаваемый параметр
+        let titleSearch = title.includes(valueSearch);
 
         if (titleSearch) {
-          createContent(idr, titler, textr);
+          createContent(id, title, text); // file: createContent.js
         } else {
+          // Очищаем контейнер
           document.querySelector('.js-container-content').innerHTML += '';
         }
       });
 
-      await darkThemeAdd();
+      await darkThemeAdd();               // file: darkThemeAdd;
 
     } catch (err) {
       document.querySelector('.js-container-content').innerHTML = "Произошла ошибка";
