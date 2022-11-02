@@ -16,14 +16,14 @@ function searchStart(valueSearch) {
         if (titleSearch) {
           createContent(idr, titler, textr);
         } else {
-          document.querySelector('.main').innerHTML += '';
+          document.querySelector('.js-container-content').innerHTML += '';
         }
       });
 
       await darkThemeAdd();
 
     } catch (err) {
-      document.querySelector('.main').innerHTML = "Произошла ошибка";
+      document.querySelector('.js-container-content').innerHTML = "Произошла ошибка";
     }
   })();
 }

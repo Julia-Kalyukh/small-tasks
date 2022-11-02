@@ -4,7 +4,7 @@ function startDownload() {
 
 
   if (searchParams) {
-    document.querySelector('.search__input').value = searchParams;
+    document.querySelector('.js-input-search').value = searchParams;
     searchStart(searchParams);
     searchClick();
   } else {

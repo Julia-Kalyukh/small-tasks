@@ -1,0 +1,45 @@
+.main {
+  margin: 0 auto;
+  max-width: 1440px;
+}
+
+.search {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+.search__input {
+  width: 400px;
+  height: 20px;
+  padding: 10px;
+
+  border: 1px solid #EBDEC2;
+  outline: none;
+}
+
+.btn {
+  color: white;
+  cursor: pointer;
+  border: 1px solid #CCA150;
+
+  &:hover {
+    filter: hue-rotate(345deg);
+  }
+
+  &--search {
+    background-color: #E2CD9C;
+  }
+
+  &--clear {
+    margin-left: 10px;
+    background: none;
+    color: #CCA150;
+  }
+}
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 20px 20px;
+}

@@ -1,21 +1,21 @@
 function launchSearchValue() {
-  let search = document.querySelector('.search__input'),
+  let search = document.querySelector('.js-input-search'),
     value = search.value,
     newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + `?search=${value}`;
 
   window.history.pushState({ path: newurl }, "", newurl);
 
   if (value) {
-    document.querySelector('.main').innerHTML = '';
+    document.querySelector('.js-container-content').innerHTML = '';
     searchStart(value);
   } else {
-    document.querySelector('.main').innerHTML = "Введите значение";
+    document.querySelector('.js-container-content').innerHTML = "Введите значение";
   }
 }
 
 function searchClick() {
-  let searchInput = document.querySelector('.search__input'),
-    searchBtn = document.querySelector('.search__btn');
+  let searchInput = document.querySelector('.js-input-search'),
+    searchBtn = document.querySelector('.js-btn-search');
 
   searchBtn.addEventListener('click', function () {
     launchSearchValue();

@@ -5,8 +5,9 @@ function createContent(id, title, text) {
                 <div class="content__text">
                   ${text}
                 </div>
-                <input type="checkbox" class="content__checkbox content__checkbox--${id}">
-              </div>`;
+                    <input type="checkbox" class="content__checkbox content__checkbox--${id} custom-checkbox">
+                    <label></label>
+                </div>`;
 
-  document.querySelector('.main').innerHTML += html;
+  document.querySelector('.js-container-content').innerHTML += html;
 }

@@ -1,0 +1,38 @@
+.content {
+  max-width: 300px;
+  margin: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 2px solid #F3ECDC;
+}
+
+.content__title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #D2AC68;
+}
+
+.content__text {
+  color: #3A3A3A;
+}
+
+.content__checkbox {
+  width: 13px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.content.dark {
+  background: #323232;
+
+  .content__title {
+    color: #AC8642;
+  }
+
+  .content__text {
+    color: #F2EAD8;
+  }
+}
