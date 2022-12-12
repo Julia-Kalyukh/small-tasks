@@ -1,11 +1,5 @@
 # 📌 Projects
 
-
-### ✓ page_food | [Demo ▻](https://small-tasks.yuliyakalyukh.ru/page_food/index.html)
-Лэндинг доставки правильного питания  - 
-[more](https://github.com/Julia-Kalyukh/small-tasks/tree/main/page_food)
-
-
 ### ✓ cart-js | [Demo ▻](https://small-tasks.yuliyakalyukh.ru/cart-js/dist/index.html)
 Корзина товаров на JS - 
 [more](https://github.com/Julia-Kalyukh/small-tasks/tree/main/cart-js)
