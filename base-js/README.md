@@ -1,13 +1,19 @@
-# Mini Projects Demo
+# 📌 base-js
+Базовые задачи по JS
 
-[🔷 Загадки](https://riddles.yuliyakalyukh.ru)
+* Игра Black Jack | [Demo ▻](https://small-tasks.yuliyakalyukh.ru/base-js/black-jack/index.html)
+  + Использование функций и оператора ветвления if
+* Загадки | [Demo ▻](https://small-tasks.yuliyakalyukh.ru/base-js/riddles/index.html)
+  + Изучение алгоритмов, блок-схем и методов строк
+* Калькулятор вклада | [Demo ▻](https://small-tasks.yuliyakalyukh.ru/base-js/deposit-calculator/index.html)
+  + Изучение типа данных Number и математических функций
+*  Последовательность чисел | [Demo ▻](https://small-tasks.yuliyakalyukh.ru/base-js/sequence/index.html)
+   + Изучение массивов и функций
+* Забить гол | [Demo ▻](https://small-tasks.yuliyakalyukh.ru/base-js/goal/index.html)
+  + Комплексные условия выбора. Логические И, ИЛИ
+* Умножение чисел | [Demo ▻](https://small-tasks.yuliyakalyukh.ru/base-js/multiplication/index.html)
+  + Изучение переменных
+  
+<br>
 
-* Изучение алгоритмов, блок-схем и методов строк
-
-[🔷 Игра Black Jack](https://blackjack.yuliyakalyukh.ru)
-
-* Использование функций и оператора ветвления if
-
-[🔷 Калькулятор вклада](https://calc.yuliyakalyukh.ru)
-
-* Изучение типа данных Number и математических функций
+---

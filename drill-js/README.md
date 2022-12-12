@@ -1,6 +1,8 @@
-### [🔗 click link](https://www.drill.yuliyakalyukh.ru)
+# 📌 drill-js
 
-# Задача
+### [Demo ▻](https://small-tasks.yuliyakalyukh.ru/drill-js/dist/index.html)
+
+## Задача
 
 1. Сделать GET запрос
 2. Обработать ответ и отрисовать элементы массива в html
